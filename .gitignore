@@ -1,0 +1,7 @@
+*.o
+myteams_cli
+myteams_server
+CLAUDE.md
+GEMINI.md
+myteams_db.bin
+*.txt
