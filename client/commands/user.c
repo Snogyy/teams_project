@@ -14,7 +14,7 @@ void cmd_user(char **args, int client_socket)
         return;
     }
 
-    char cmd[512];
+    char cmd[1024];
     snprintf(cmd, sizeof(cmd), "USER \"%s\"\r\n", args[1]);
     write(client_socket, cmd, strlen(cmd));
 
@@ -29,7 +29,7 @@ void cmd_user(char **args, int client_socket)
     char *line = strtok(response, "\r\n");
     while (line != NULL) {
         if (strncmp(line, "USER ", 5) == 0) {
-            char uuid[37], name[32];
+            char uuid[UUID_LENGTH], name[MAX_NAME_LENGTH];
             int status;
             if (sscanf(line + 5, "%36s %31s %d", uuid, name, &status) == 3)
                 client_print_user(uuid, name, status);
