@@ -21,7 +21,9 @@ SRC_CLIENT 	=	client/client.c \
 OBJ_SERVER 	=	$(SRC_SERVER:.c=.o)
 OBJ_CLIENT 	=	$(SRC_CLIENT:.c=.o)
 
-FLAGS	+=	-Llibs/myteams -lmyteams -Wl,-rpath=libs/myteams -luuid
+FLAGS	+=	-Llibs/myteams -lmyteams -luuid
+# export LD_LIBRARY_PATH=libs/myteams:$LD_LIBRARY_PATH
+# Definir le chemin pour trouver la lib en var system
 
 BIN_SERVER 	= 	myteams_server
 BIN_CLIENT 	= 	myteams_cli

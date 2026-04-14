@@ -1,3 +1,10 @@
+/*
+** Project  -  my_teams
+** Date     -  April 13th 2026
+**
+** Copyright (c) 2026 Jules Nourdin
+*/
+
 #include "server.h"
 
 void save_db(void)
