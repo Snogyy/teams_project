@@ -1,8 +1,8 @@
 /*
-** EPITECH PROJECT, 2026
-** my_ftp
-** File description:
-** handle_client
+** Project  -  my_teams
+** Date     -  March 30th 2026
+**
+** Copyright (c) 2026 Jules Nourdin
 */
 
 #include "server.h"

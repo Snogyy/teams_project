@@ -1,0 +1,46 @@
+##
+## Project  -  my_teams
+## Date     -  April 14th 2026
+##
+## Copyright (c) 2026 Jules Nourdin
+##
+
+SRC_SERVER 	=	server/server.c \
+				server/handle_client.c \
+				server/utils.c \
+				server/parse_signals.c \
+				server/db.c \
+				server/signals/login.c \
+				server/signals/quit.c
+
+SRC_CLIENT 	=	client/client.c \
+				client/utils.c \
+				client/parse_commands.c \
+				client/commands/login.c
+
+OBJ_SERVER 	=	$(SRC_SERVER:.c=.o)
+OBJ_CLIENT 	=	$(SRC_CLIENT:.c=.o)
+
+FLAGS	+=	-Llibs/myteams -lmyteams -Wl,-rpath=libs/myteams -luuid
+
+BIN_SERVER 	= 	myteams_server
+BIN_CLIENT 	= 	myteams_cli
+
+
+all:	server client
+
+server:	$(OBJ_SERVER)
+	gcc -o $(BIN_SERVER) $(OBJ_SERVER) $(FLAGS)
+
+client:	$(OBJ_CLIENT)
+	gcc -o $(BIN_CLIENT) $(OBJ_CLIENT) $(FLAGS)
+
+clean :
+	rm -f $(OBJ_SERVER)
+	rm -f $(OBJ_CLIENT)
+
+fclean: clean
+	rm -f $(BIN_SERVER)
+	rm -f $(BIN_CLIENT)
+
+re: fclean all

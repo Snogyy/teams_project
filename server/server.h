@@ -131,7 +131,7 @@
     void generate_client_respons(int fd, char *respons);
     char *find_reply(int reply_nb);
     void parse_signals(char *received_buffer, int client_index);
-    void signal_user(char *argument, int client_index);
+    void signal_login(char *argument, int client_index);
     void signal_quit(char *argument, int client_index);
     int create_data_transfer_socket(int client_index);
 

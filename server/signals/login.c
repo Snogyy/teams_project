@@ -7,7 +7,7 @@
 
 #include "../server.h"
 
-void signal_user(char *argument, int client_index)
+void signal_login(char *argument, int client_index)
 {
     int actual_client_fd = server.pfd_list[client_index].fd;
     client_info_t *client = &server.clients[client_index - 1];
