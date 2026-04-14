@@ -11,12 +11,14 @@ SRC_SERVER 	=	server/server.c \
 				server/parse_signals.c \
 				server/db.c \
 				server/signals/login.c \
-				server/signals/quit.c
+				server/signals/quit.c \
+				server/commands/users.c
 
 SRC_CLIENT 	=	client/client.c \
 				client/utils.c \
 				client/parse_commands.c \
-				client/commands/login.c
+				client/commands/login.c \
+				client/commands/users.c
 
 OBJ_SERVER 	=	$(SRC_SERVER:.c=.o)
 OBJ_CLIENT 	=	$(SRC_CLIENT:.c=.o)

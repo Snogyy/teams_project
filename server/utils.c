@@ -12,6 +12,7 @@ server_struct_t server;
 signals_t signals[] = {
     {"LOGI", signal_login},
     {"LOGO", signal_quit},
+    {"USRS", signal_users},
     {NULL, NULL}
 };
 

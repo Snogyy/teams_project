@@ -133,6 +133,7 @@
     void parse_signals(char *received_buffer, int client_index);
     void signal_login(char *argument, int client_index);
     void signal_quit(char *argument, int client_index);
+    void signal_users(char *argument, int client_index);
     int create_data_transfer_socket(int client_index);
 
     void save_db(void);
