@@ -7,3 +7,4 @@
 
 void cmd_login(char **args, int client_socket);
 void cmd_users(char **args, int client_socket);
+void cmd_user(char **args, int client_socket);

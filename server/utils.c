@@ -13,6 +13,7 @@ signals_t signals[] = {
     {"LOGI", signal_login},
     {"LOGO", signal_quit},
     {"USRS", signal_users},
+    {"USER", signal_user},
     {NULL, NULL}
 };
 
