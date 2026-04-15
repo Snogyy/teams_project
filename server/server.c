@@ -82,6 +82,7 @@ int main(int argc, char **argv)
     server.nb_teams = 0;
     server.nb_channels = 0;
     server.nb_threads = 0;
+    server.nb_messages = 0;
     load_db();
 
     while (1) {

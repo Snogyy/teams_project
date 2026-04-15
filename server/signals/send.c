@@ -63,6 +63,13 @@ void signal_send(char *argument, int client_index)
 
     server_event_private_message_sended(client->user_uuid, receiver_uuid, body);
 
+    private_message_t *msg = &server.messages[server.nb_messages];
+    strncpy(msg->sender_uuid, client->user_uuid, UUID_LENGTH - 1);
+    strncpy(msg->receiver_uuid, receiver_uuid, UUID_LENGTH - 1);
+    strncpy(msg->body, body, MAX_BODY_LENGTH - 1);
+    msg->timestamp = time(NULL);
+    server.nb_messages++;
+
     for (int i = 1; i < server.nb_clients; i++) {
         if (strcmp(server.clients[i - 1].user_uuid, receiver_uuid) == 0) {
             char notif[512 + 100];

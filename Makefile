@@ -14,7 +14,8 @@ SRC_SERVER 	=	server/server.c \
 				server/signals/quit.c \
 				server/commands/users.c \
 				server/signals/user.c \
-				server/signals/send.c
+				server/signals/send.c \
+				server/signals/messages.c
 
 SRC_CLIENT 	=	client/client.c \
 				client/utils.c \
@@ -22,7 +23,8 @@ SRC_CLIENT 	=	client/client.c \
 				client/commands/login.c \
 				client/commands/users.c \
 				client/commands/user.c \
-				client/commands/send.c
+				client/commands/send.c \
+				client/commands/messages.c
 
 OBJ_SERVER 	=	$(SRC_SERVER:.c=.o)
 OBJ_CLIENT 	=	$(SRC_CLIENT:.c=.o)

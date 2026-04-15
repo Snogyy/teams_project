@@ -15,5 +15,6 @@ commands_t commands[] = {
     {"/users", cmd_users},
     {"/user",  cmd_user},
     {"/send",  cmd_send},
+    {"/messages", cmd_messages},
     {NULL, NULL}
 };

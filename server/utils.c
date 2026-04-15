@@ -15,6 +15,7 @@ signals_t signals[] = {
     {"USRS", signal_users},
     {"USER", signal_user},
     {"SEND", signal_send},
+    {"MSGS", signal_messages},
     {NULL, NULL}
 };
 

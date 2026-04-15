@@ -113,6 +113,9 @@
 
         thread_t threads[MAX_CLIENTS * 10];
         int nb_threads;
+
+        private_message_t messages[MAX_CLIENTS * 100];
+        int nb_messages;
     } server_struct_t;
 
      typedef struct {
@@ -136,6 +139,7 @@
     void signal_users(char *argument, int client_index);
     void signal_user(char *argument, int client_index);
     void signal_send(char *argument, int client_index);
+    void signal_messages(char *argument, int client_index);
     int create_data_transfer_socket(int client_index);
 
     void save_db(void);
