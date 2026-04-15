@@ -14,6 +14,7 @@ signals_t signals[] = {
     {"LOGO", signal_quit},
     {"USRS", signal_users},
     {"USER", signal_user},
+    {"SEND", signal_send},
     {NULL, NULL}
 };
 
