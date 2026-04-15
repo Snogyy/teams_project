@@ -12,6 +12,8 @@ current_user_t current_user;
 
 commands_t commands[] = {
     {"/login", cmd_login},
+    {"/logout", cmd_logout},
+    {"/help", cmd_help},
     {"/users", cmd_users},
     {"/user",  cmd_user},
     {"/send",  cmd_send},

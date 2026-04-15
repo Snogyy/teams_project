@@ -6,6 +6,7 @@
 */
 
 #include "server.h"
+#include "signals/signals.h"
 
 void receive_client_connections()
 {
@@ -16,7 +17,7 @@ void receive_client_connections()
         int client_socket = accept(server.server_socket, (struct sockaddr *)&server_address, &addrlen);
 
         if (client_socket < 0) {
-            printf("Connection failed\n");
+            printf("-> Connection failed\n");
         } else if (server.nb_clients < MAX_CLIENTS) {
             server.clients[server.nb_clients - 1].data_transfer.data_socket = 0;
             strcpy(server.clients[server.nb_clients - 1].data_transfer.ip_str, "");
@@ -30,10 +31,10 @@ void receive_client_connections()
             server.pfd_list[server.nb_clients].events = POLLIN;
             server.pfd_list[server.nb_clients].revents = 0;
             server.nb_clients++;
-            printf("Connection successful! Connection from %s:%i\n", inet_ntoa(server_address.sin_addr), ntohs(server_address.sin_port));
+            printf("-> Connection successful! Connection from %s:%i\n", inet_ntoa(server_address.sin_addr), ntohs(server_address.sin_port));
             generate_client_respons(client_socket, find_reply(220));
         } else {
-            write(client_socket, "Max clients reached.", strlen("Max clients reached."));
+            write(client_socket, "-> Max clients reached.", strlen("-> Max clients reached."));
             close(client_socket);
         }
     }
@@ -49,7 +50,15 @@ void handle_client()
 
             // If we cant read, client is offline
             if (res_read <= 0) {
-                printf("Client %d disconnected\n", i);
+                signal_logout("", i);
+                // if (client->logged) {
+                //     for (int u = 0; u < server.nb_users; u++) {
+                //         if (strcmp(server.users[u].uuid, client->user_uuid) == 0) {
+                //             server.users[u].is_connected = false;
+                //             break;
+                //         }
+                //     }
+                // }
                 if (server.clients[i - 1].data_transfer.data_socket > 0)
                     close(server.clients[i - 1].data_transfer.data_socket);
                 close(server.pfd_list[i].fd);

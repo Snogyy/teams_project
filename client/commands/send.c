@@ -6,16 +6,17 @@
 */
 
 #include "../client.h"
+#include "commands.h"
 
-void cmd_send(char **args, int client_socket)
+int cmd_send(char **args, int client_socket)
 {
     if (args[1] == NULL || args[2] == NULL || args[3] != NULL) {
         printf("Usage: /send \"user_uuid\" \"message_body\"\n");
-        return;
+        return 1;
     }
     if (strlen(args[2]) > MAX_BODY_LENGTH - 1) {
         printf("Message is too long\n");
-        return;
+        return 1;
     }
 
     char cmd[1024];
@@ -24,22 +25,19 @@ void cmd_send(char **args, int client_socket)
 
     char response[4096];
     int res_read = read(client_socket, response, sizeof(response) - 1);
-    if (res_read <= 0) {
-        printf("Server disconnected.\n");
-        return;
-    }
+    if (res_read <= 0)
+        return cmd_logout(args, client_socket);
     response[res_read] = '\0';
 
     char *line = strtok(response, "\r\n");
     while (line != NULL) {
-        if (strncmp(line, "250", 3) == 0) {
-        } else if (strncmp(line, "404", 3) == 0) {
+        if (strncmp(line, "404", 3) == 0)
             client_error_unknown_user(args[1]);
-        } else if (strncmp(line, "401", 3) == 0) {
+        else if (strncmp(line, "401", 3) == 0)
             client_error_unauthorized();
-        } else if (strncmp(line, "413", 3) == 0) {
+        else if (strncmp(line, "413", 3) == 0)
             printf("Message too long\n");
-        } else if (strncmp(line, "PMSG ", 5) == 0) {
+        else if (strncmp(line, "PMSG ", 5) == 0) {
             char sender_uuid[UUID_LENGTH];
             char body[MAX_BODY_LENGTH];
             if (sscanf(line + 5, "%36s \"%511[^\"]\"", sender_uuid, body) == 2)
@@ -47,4 +45,5 @@ void cmd_send(char **args, int client_socket)
         }
         line = strtok(NULL, "\r\n");
     }
+    return 1;
 }

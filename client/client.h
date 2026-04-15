@@ -38,7 +38,7 @@
 
     typedef struct {
         char *name;
-        void (*cmd_func)(char **args, int client_socket);
+        int (*cmd_func)(char **args, int client_socket);
     } commands_t;
 
     void parse_commands(int client_socket);

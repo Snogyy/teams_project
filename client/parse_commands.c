@@ -47,7 +47,7 @@ int separate_args(char *cmd, char **args)
     }
 
     if (quote_error) {
-        printf("Arguments must takes double quotes.\n");
+        printf("-> Arguments must takes double quotes.\n");
         return -1;
     }
     args[argc] = NULL;
@@ -60,7 +60,8 @@ void parse_commands(int client_socket)
     int res_read;
     char *actual_arg;
     int argc;
-    int command_exist;
+    int command_found = 0;
+    int command_res = 0;
 
     while (1) {
         printf("> ");
@@ -70,26 +71,36 @@ void parse_commands(int client_socket)
         if (res_read <= 0) break;
         if (cmd[res_read - 1] == '\n') cmd[res_read - 1] = '\0';
 
-        if (strcmp(cmd, "/logout") == 0)
-            break;
-
         // Separate command in args
         char *args[10];
         argc = separate_args(cmd, args);
         if (argc == -1) continue;
 
+        // Exec command only if user is connected
+        if (!current_user.is_logged && strcmp(args[0], "/login") != 0) {
+            printf("-> You must be logged in to perform actions.\n");
+            continue;
+        }
+
+        // Cannot logged in twice
+        if (current_user.is_logged && strcmp(args[0], "/login") == 0) {
+            printf("-> You are already logged in.\n");
+            continue;
+        }
+
         // Exec command
-        command_exist = 0;
         for (int i = 0; commands[i].name != NULL; i++) {
             if (strcmp(args[0], commands[i].name) == 0) {
-                commands[i].cmd_func(args, client_socket);
-                command_exist = 1;
+                command_res = commands[i].cmd_func(args, client_socket);
+                command_found = 1;
                 break;
             }
         }
 
-        if (command_exist == 0)
-            printf("Unknown command\n");
+        if (command_found == 0)
+            printf("-> Unknown command\n");
+        if (command_res == -1)
+            break;
     }
 
 }

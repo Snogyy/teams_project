@@ -6,11 +6,10 @@
 */
 
 #include "../client.h"
+#include "commands.h"
 
-void cmd_users(char **args, int client_socket)
+int cmd_users(char **args, int client_socket)
 {
-    (void)args;
-
     write(client_socket, "USRS\r\n", 6);
 
     char response[4096];
@@ -18,17 +17,15 @@ void cmd_users(char **args, int client_socket)
 
     while (1) {
         res_read = read(client_socket, response, sizeof(response) - 1);
-        if (res_read <= 0) {
-            printf("Server disconnected.\n");
-            return;
-        }
+        if (res_read <= 0)
+            return cmd_logout(args, client_socket);
         response[res_read] = '\0';
 
         char *line = strtok(response, "\r\n");
         while (line != NULL) {
             if (strncmp(line, "240", 3) == 0) {
             } else if (strncmp(line, "250", 3) == 0) {
-                return;
+                return 1;
             } else if (strncmp(line, "USER ", 5) == 0) {
                 char uuid[37], name[32];
                 int status;
@@ -36,11 +33,12 @@ void cmd_users(char **args, int client_socket)
                     client_print_users(uuid, name, status);
             } else if (strncmp(line, "401", 3) == 0) {
                 client_error_unauthorized();
-                return;
+                return 1;
             } else {
                 printf("%s\n", line);
             }
             line = strtok(NULL, "\r\n");
         }
     }
+    return 1;
 }

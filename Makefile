@@ -11,7 +11,7 @@ SRC_SERVER 	=	server/server.c \
 				server/parse_signals.c \
 				server/db.c \
 				server/signals/login.c \
-				server/signals/quit.c \
+				server/signals/logout.c \
 				server/commands/users.c \
 				server/signals/user.c \
 				server/signals/send.c \
@@ -21,6 +21,8 @@ SRC_CLIENT 	=	client/client.c \
 				client/utils.c \
 				client/parse_commands.c \
 				client/commands/login.c \
+				client/commands/logout.c \
+				client/commands/help.c \
 				client/commands/users.c \
 				client/commands/user.c \
 				client/commands/send.c \

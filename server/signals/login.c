@@ -19,11 +19,10 @@ void signal_login(char *argument, int client_index)
 
     // Remove quotes
     char username[MAX_NAME_LENGTH] = {0};
-    if (argument[0] == '"' && argument[strlen(argument) - 1] == '"') {
+    if (argument[0] == '"' && argument[strlen(argument) - 1] == '"')
         strncpy(username, argument + 1, strlen(argument) - 2);
-    } else {
+    else
         strncpy(username, argument, MAX_NAME_LENGTH - 1);
-    }
 
     // Check if user exists
     int user_index = -1;

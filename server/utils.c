@@ -6,12 +6,13 @@
 */
 
 #include "server.h"
+#include "signals/signals.h"
 
 server_struct_t server;
 
 signals_t signals[] = {
     {"LOGI", signal_login},
-    {"LOGO", signal_quit},
+    {"LOGO", signal_logout},
     {"USRS", signal_users},
     {"USER", signal_user},
     {"SEND", signal_send},
@@ -71,21 +72,4 @@ char *find_reply(int reply_nb)
             return replies[i].message;
     }
     return NULL;
-}
-
-int create_data_transfer_socket(int client_index)
-{
-    int res_data_socket;
-    int actual_client_fd = server.pfd_list[client_index].fd;
-    client_info_t actual_client = server.clients[client_index - 1];
-    int actual_data_socket = actual_client.data_transfer.data_socket;
-
-    struct sockaddr_in client_addr;
-    socklen_t client_addr_len = sizeof(client_addr);
-    res_data_socket = accept(actual_data_socket, (struct sockaddr *)&client_addr, &client_addr_len);
-    if (res_data_socket < 0) {
-        generate_client_respons(actual_client_fd, "425 Can't open data connection.");
-        return -1;
-    }
-    return res_data_socket;
 }

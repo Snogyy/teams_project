@@ -11,7 +11,7 @@ void save_db(void)
 {
     FILE *fd = fopen("myteams_db.bin", "wb");
     if (!fd) {
-        printf("ERROR: Could not open database file\n");
+        printf("-> ERROR: Could not open database file\n");
         return;
     }
 
@@ -41,14 +41,14 @@ void save_db(void)
         fwrite(server.messages, sizeof(private_message_t), server.nb_messages, fd);
     
     fclose(fd);
-    printf("Database saved successfully\n");
+    printf("-> Database saved successfully\n");
 }
 
 void load_db(void)
 {
     FILE *fd = fopen("myteams_db.bin", "rb");
     if (!fd) {
-        printf("No database found\n");
+        printf("-> No database found\n");
         server.nb_users = 0;
         server.nb_teams = 0;
         server.nb_channels = 0;
@@ -82,5 +82,5 @@ void load_db(void)
         fread(server.messages, sizeof(private_message_t), server.nb_messages, fd);
     
     fclose(fd);
-    printf("Database loaded successfully\n");
+    printf("-> Database loaded successfully\n");
 }
