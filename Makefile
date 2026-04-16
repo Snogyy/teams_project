@@ -12,7 +12,7 @@ SRC_SERVER 	=	server/server.c \
 				server/db.c \
 				server/signals/login.c \
 				server/signals/logout.c \
-				server/commands/users.c \
+				server/signals/users.c \
 				server/signals/user.c \
 				server/signals/send.c \
 				server/signals/messages.c
