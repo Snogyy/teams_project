@@ -15,6 +15,7 @@ commands_t commands[] = {
     {"/logout", cmd_logout},
     {"/subscribe", cmd_subscribe},
     {"/unsubscribe", cmd_unsubscribe},
+    {"/subscribed", cmd_subscribed},
     {"/help", cmd_help},
     {"/users", cmd_users},
     {"/user",  cmd_user},

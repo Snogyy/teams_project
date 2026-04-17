@@ -13,6 +13,7 @@ server_struct_t server;
 signals_t signals[] = {
     {"LOGI", signal_login},
     {"SUBB", signal_subscribe},
+    {"SUBD", signal_subscribed},
     {"UNSU", signal_unsubscribe},
     {"LOGO", signal_logout},
     {"USRS", signal_users},
