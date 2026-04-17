@@ -78,7 +78,7 @@ void parse_commands(int client_socket)
 
         // Exec command only if user is connected
         if (!current_user.is_logged && strcmp(args[0], "/login") != 0) {
-            printf("-> You must be logged in to perform actions.\n");
+            client_error_unauthorized();
             continue;
         }
 

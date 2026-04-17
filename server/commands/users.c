@@ -12,7 +12,7 @@ void signal_users(char *argument, int client_index)
     (void)argument;
     int actual_client_fd = server.pfd_list[client_index].fd;
 
-    generate_client_respons(actual_client_fd, find_reply(240));
+    generate_client_respons(actual_client_fd, find_reply_server(240));
 
     for (int i = 0; i < server.nb_users; i++) {
         char line[512];
@@ -23,5 +23,5 @@ void signal_users(char *argument, int client_index)
         generate_client_respons(actual_client_fd, line);
     }
 
-    generate_client_respons(actual_client_fd, find_reply(250));
+    generate_client_respons(actual_client_fd, find_reply_server(250));
 }

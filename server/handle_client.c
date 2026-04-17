@@ -19,10 +19,11 @@ void receive_client_connections()
         if (client_socket < 0) {
             printf("-> Connection failed\n");
         } else if (server.nb_clients < MAX_CLIENTS) {
-            server.clients[server.nb_clients - 1].data_transfer.data_socket = 0;
-            strcpy(server.clients[server.nb_clients - 1].data_transfer.ip_str, "");
-            server.clients[server.nb_clients - 1].data_transfer.port = -1;
             server.clients[server.nb_clients - 1].logged = false;
+            server.clients[server.nb_clients - 1].context.context_level = GLOBAL;
+            strcpy(server.clients[server.nb_clients - 1].context.team_uuid, "");
+            strcpy(server.clients[server.nb_clients - 1].context.channel_uuid, "");
+            strcpy(server.clients[server.nb_clients - 1].context.thread_uuid, "");
             server.clients[server.nb_clients - 1].write_len = 0;
             server.clients[server.nb_clients - 1].write_buffer[0] = '\0';
             server.clients[server.nb_clients - 1].read_len = 0;
@@ -32,7 +33,7 @@ void receive_client_connections()
             server.pfd_list[server.nb_clients].revents = 0;
             server.nb_clients++;
             printf("-> Connection successful! Connection from %s:%i\n", inet_ntoa(server_address.sin_addr), ntohs(server_address.sin_port));
-            generate_client_respons(client_socket, find_reply(220));
+            generate_client_respons(client_socket, find_reply_server(220));
         } else {
             write(client_socket, "-> Max clients reached.", strlen("-> Max clients reached."));
             close(client_socket);
@@ -51,16 +52,6 @@ void handle_client()
             // If we cant read, client is offline
             if (res_read <= 0) {
                 signal_logout("", i);
-                // if (client->logged) {
-                //     for (int u = 0; u < server.nb_users; u++) {
-                //         if (strcmp(server.users[u].uuid, client->user_uuid) == 0) {
-                //             server.users[u].is_connected = false;
-                //             break;
-                //         }
-                //     }
-                // }
-                if (server.clients[i - 1].data_transfer.data_socket > 0)
-                    close(server.clients[i - 1].data_transfer.data_socket);
                 close(server.pfd_list[i].fd);
                 for (int j = i; j < server.nb_clients - 1; j++) {
                     server.pfd_list[j] = server.pfd_list[j + 1];

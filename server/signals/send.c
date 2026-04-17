@@ -13,7 +13,7 @@ void signal_send(char *argument, int client_index)
     client_info_t *client = &server.clients[client_index - 1];
 
     if (argument == NULL || strlen(argument) == 0) {
-        generate_client_respons(actual_client_fd, find_reply(400));
+        generate_client_respons(actual_client_fd, find_reply_server(400));
         return;
     }
 
@@ -21,31 +21,31 @@ void signal_send(char *argument, int client_index)
     char body[MAX_BODY_LENGTH] = {0};
 
     if (argument[0] != '"') {
-        generate_client_respons(actual_client_fd, find_reply(400));
+        generate_client_respons(actual_client_fd, find_reply_server(400));
         return;
     }
     char *uuid_end = strchr(argument + 1, '"');
     if (!uuid_end) {
-        generate_client_respons(actual_client_fd, find_reply(400));
+        generate_client_respons(actual_client_fd, find_reply_server(400));
         return;
     }
     strncpy(receiver_uuid, argument + 1, uuid_end - argument - 1);
 
     char *body_start = strchr(uuid_end + 1, '"');
     if (!body_start) {
-        generate_client_respons(actual_client_fd, find_reply(400));
+        generate_client_respons(actual_client_fd, find_reply_server(400));
         return;
     }
     body_start++;
     char *body_end = strrchr(body_start, '"');
     if (!body_end || body_end == body_start - 1) {
-        generate_client_respons(actual_client_fd, find_reply(400));
+        generate_client_respons(actual_client_fd, find_reply_server(400));
         return;
     }
     strncpy(body, body_start, body_end - body_start);
 
     if (strlen(body) > MAX_BODY_LENGTH - 1) {
-        generate_client_respons(actual_client_fd, find_reply(413));
+        generate_client_respons(actual_client_fd, find_reply_server(413));
         return;
     }
 
@@ -57,7 +57,7 @@ void signal_send(char *argument, int client_index)
         }
     }
     if (receiver_index == -1) {
-        generate_client_respons(actual_client_fd, find_reply(404));
+        generate_client_respons(actual_client_fd, find_reply_server(404));
         return;
     }
 
@@ -79,5 +79,5 @@ void signal_send(char *argument, int client_index)
         }
     }
 
-    generate_client_respons(actual_client_fd, find_reply(250));
+    generate_client_respons(actual_client_fd, find_reply_server(250));
 }
