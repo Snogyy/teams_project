@@ -5,6 +5,7 @@
 ** Copyright (c) 2026 Jules Nourdin
 */
 
+#include <poll.h>
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
