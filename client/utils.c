@@ -8,7 +8,14 @@
 #include "client.h"
 #include "commands/commands.h"
 
-current_user_t current_user;
+user_t current_user;
+
+client_context_t current_context = {
+    .team_uuid = "",
+    .channel_uuid = "",
+    .thread_uuid = "",
+    .context_level = GLOBAL
+};
 
 commands_t commands[] = {
     {"/login", cmd_login},
@@ -18,5 +25,7 @@ commands_t commands[] = {
     {"/user",  cmd_user},
     {"/send",  cmd_send},
     {"/messages", cmd_messages},
+    {"/use", cmd_use},
+    {"/create", cmd_create},
     {NULL, NULL}
 };

@@ -13,7 +13,7 @@ void signal_messages(char *argument, int client_index)
     client_info_t *client = &server.clients[client_index - 1];
 
     if (argument == NULL || strlen(argument) == 0) {
-        generate_client_respons(actual_client_fd, find_reply(400));
+        generate_client_respons(actual_client_fd, find_reply_server(400));
         return;
     }
 
@@ -31,11 +31,11 @@ void signal_messages(char *argument, int client_index)
         }
     }
     if (!found) {
-        generate_client_respons(actual_client_fd, find_reply(404));
+        generate_client_respons(actual_client_fd, find_reply_server(404));
         return;
     }
 
-    generate_client_respons(actual_client_fd, find_reply(240));
+    generate_client_respons(actual_client_fd, find_reply_server(240));
 
     for (int i = 0; i < server.nb_messages; i++) {
 
@@ -51,5 +51,5 @@ void signal_messages(char *argument, int client_index)
         }
     }
 
-    generate_client_respons(actual_client_fd, find_reply(250));
+    generate_client_respons(actual_client_fd, find_reply_server(250));
 }

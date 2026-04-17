@@ -28,13 +28,20 @@
         char uuid[UUID_LENGTH];
         char username[MAX_NAME_LENGTH];
         bool is_logged;
-    } current_user_t;
+    } user_t;
+
+    enum CONTEXT_LEVEL {
+        TEAM,
+        CHANNEL,
+        THREAD,
+        GLOBAL
+    };
 
     typedef struct {
         char team_uuid[UUID_LENGTH];
         char channel_uuid[UUID_LENGTH];
         char thread_uuid[UUID_LENGTH];
-        int level; // 0: global, 1: team, 2: channel, 3: thread
+        enum CONTEXT_LEVEL context_level;
     } client_context_t;
 
     typedef struct {
@@ -43,7 +50,8 @@
     } commands_t;
 
     void parse_commands(int client_socket);
-    extern current_user_t current_user;
+    extern user_t current_user;
+    extern client_context_t current_context;
     extern commands_t commands[];
 
 #endif

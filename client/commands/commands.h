@@ -12,3 +12,5 @@ int cmd_users(char **args, int client_socket);
 int cmd_user(char **args, int client_socket);
 int cmd_send(char **args, int client_socket);
 int cmd_messages(char **args, int client_socket);
+int cmd_use(char **args, int client_socket);
+int cmd_create(char **args, int client_socket);

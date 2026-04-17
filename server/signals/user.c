@@ -12,7 +12,7 @@ void signal_user(char *argument, int client_index)
     int actual_client_fd = server.pfd_list[client_index].fd;
 
     if (argument == NULL || strlen(argument) == 0) {
-        generate_client_respons(actual_client_fd, find_reply(400));
+        generate_client_respons(actual_client_fd, find_reply_server(400));
         return;
     }
 
@@ -30,10 +30,10 @@ void signal_user(char *argument, int client_index)
                 server.users[i].name,
                 server.users[i].is_connected ? 1 : 0);
             generate_client_respons(actual_client_fd, line);
-            generate_client_respons(actual_client_fd, find_reply(250));
+            generate_client_respons(actual_client_fd, find_reply_server(250));
             return;
         }
     }
 
-    generate_client_respons(actual_client_fd, find_reply(404));
+    generate_client_respons(actual_client_fd, find_reply_server(404));
 }

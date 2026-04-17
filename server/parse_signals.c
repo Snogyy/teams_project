@@ -9,16 +9,28 @@
 
 void parse_signals(char *received_buffer, int client_index)
 {
-    received_buffer[strcspn(received_buffer, "\r\n")] = '\0';
-    char *cmd = strtok(received_buffer, " ");
-    char *arg = strtok(NULL, "");
+    char *cmd = NULL;
+    char *arg = NULL;
+    char *space = NULL;
 
-    if (cmd == NULL)
-        return generate_client_respons(server.pfd_list[client_index].fd, "500 Unrecognized command");
+    received_buffer[strcspn(received_buffer, "\r\n")] = '\0';
+    space = strchr(received_buffer, ' ');
+    if (space != NULL) {
+        *space = '\0';
+        arg = space + 1;
+        while (*arg == ' ')
+            arg++;
+        if (*arg == '\0')
+            arg = NULL;
+    }
+    cmd = received_buffer;
+
+    if (cmd == NULL || *cmd == '\0')
+        return generate_client_respons(server.pfd_list[client_index].fd, find_reply_server(500));
 
     if (server.clients[client_index - 1].logged == false) {
         if (strcmp(cmd, "LOGI") != 0)
-            return generate_client_respons(server.pfd_list[client_index].fd, "530 Not logged in.");
+            return generate_client_respons(server.pfd_list[client_index].fd, find_reply_server(401));
     }
 
     for (int i = 0; signals[i].name != NULL; i++) {
@@ -27,5 +39,5 @@ void parse_signals(char *received_buffer, int client_index)
             return;
         }
     }
-    generate_client_respons(server.pfd_list[client_index].fd, "500 Unrecognized command");
+    generate_client_respons(server.pfd_list[client_index].fd, find_reply_server(500));
 }

@@ -13,7 +13,7 @@ void signal_login(char *argument, int client_index)
     client_info_t *client = &server.clients[client_index - 1];
 
     if (argument == NULL || strlen(argument) == 0) {
-        generate_client_respons(actual_client_fd, "400 Missing username");
+        generate_client_respons(actual_client_fd, find_reply_server(400));
         return;
     }
 
@@ -36,7 +36,7 @@ void signal_login(char *argument, int client_index)
     // User exists
     if (user_index != -1) {
         if (server.users[user_index].is_connected) {
-            generate_client_respons(actual_client_fd, "430 User already connected");
+            generate_client_respons(actual_client_fd, find_reply_server(430));
             return;
         }
 
@@ -52,7 +52,7 @@ void signal_login(char *argument, int client_index)
     // Create user
     } else {
         if (server.nb_users >= MAX_CLIENTS) {
-            generate_client_respons(actual_client_fd, "500 Server full");
+            generate_client_respons(actual_client_fd, find_reply_server(560));
             return;
         }
         user_index = server.nb_users;

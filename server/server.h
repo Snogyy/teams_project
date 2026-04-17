@@ -61,28 +61,37 @@
 
     typedef struct {
         char uuid[UUID_LENGTH];
+        char team_uuid[UUID_LENGTH];
         char channel_uuid[UUID_LENGTH];
-        char author_uuid[UUID_LENGTH];
         char title[MAX_NAME_LENGTH];
         char body[MAX_BODY_LENGTH];
         time_t timestamp;
     } thread_t;
 
     typedef struct {
-        int data_socket;
-        char ip_str[16];
-        int port;
-    } data_transfer_t;
+        char uuid[UUID_LENGTH];
+        char team_uuid[UUID_LENGTH];
+        char channel_uuid[UUID_LENGTH];
+        char thread_uuid[UUID_LENGTH];
+        char body[MAX_BODY_LENGTH];
+        time_t timestamp;
+    } reply_thread_t;
+
+    enum CONTEXT_LEVEL {
+        TEAM,
+        CHANNEL,
+        THREAD,
+        GLOBAL
+    };
 
     typedef struct {
         char team_uuid[UUID_LENGTH];
         char channel_uuid[UUID_LENGTH];
         char thread_uuid[UUID_LENGTH];
-        int level; // 0: global, 1: team, 2: channel, 3: thread
+        enum CONTEXT_LEVEL context_level;
     } client_context_t;
 
     typedef struct {
-        data_transfer_t data_transfer;
         char username[MAX_NAME_LENGTH];
         char user_uuid[UUID_LENGTH];
         bool logged;
@@ -114,6 +123,9 @@
         thread_t threads[MAX_CLIENTS * 10];
         int nb_threads;
 
+        reply_thread_t replies[MAX_CLIENTS * 100];
+        int nb_replies;
+
         private_message_t messages[MAX_CLIENTS * 100];
         int nb_messages;
     } server_struct_t;
@@ -126,20 +138,21 @@
     typedef struct {
         int code;
         char *message;
-    } reply_t;
+    } reply_server_t;
 
     void receive_client_connections();
     void handle_client();
     void append_to_client_buffer(int fd, char *str);
     void generate_client_respons(int fd, char *respons);
-    char *find_reply(int reply_nb);
+    char *find_reply_server(int reply_nb);
     void parse_signals(char *received_buffer, int client_index);
+    int extract_args(char *argument, char **av, int max_args);
 
     void save_db(void);
     void load_db(void);
 
     extern server_struct_t server;
     extern signals_t signals[];
-    extern reply_t replies[];
+    extern reply_server_t replies[];
 
 #endif
