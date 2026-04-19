@@ -61,12 +61,6 @@ void generate_client_respons(int fd, char *respons)
     append_to_client_buffer(fd, buffer);
 }
 
-void generate_all_connected_clients_event(char *event_message)
-{
-    for (int i = 1; i < server.nb_clients; i++)
-        generate_client_respons(server.pfd_list[i].fd, event_message);
-}
-
 void generate_all_logged_clients_event(char *event_message)
 {
     for (int i = 1; i < server.nb_clients; i++) {

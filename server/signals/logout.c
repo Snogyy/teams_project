@@ -20,8 +20,7 @@ void signal_logout(char *argument, int client_index)
     }
 
     snprintf(event, sizeof(event), "EVT LOGOUT \"%s\" \"%s\"", actual_client->user_uuid, actual_client->username);
-    generate_all_connected_clients_event(event);
-    // generate_client_respons(actual_client_fd, find_reply_server(221));
+    generate_all_logged_clients_event(event);
 
     actual_client->logged = false;
     for (int i = 0; i < server.nb_users; i++) {

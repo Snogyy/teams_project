@@ -45,7 +45,7 @@ void signal_login(char *argument, int client_index)
         sprintf(response, "230 %s %s", client->user_uuid, username);
         generate_client_respons(actual_client_fd, response);
         sprintf(response, "EVT LOGIN \"%s\" \"%s\"", client->user_uuid, username);
-        generate_all_connected_clients_event(response);
+        generate_all_logged_clients_event(response);
     // Create user
     } else {
         if (server.nb_users >= MAX_CLIENTS) {
@@ -70,6 +70,6 @@ void signal_login(char *argument, int client_index)
         sprintf(response, "230 %s %s", client->user_uuid, username);
         generate_client_respons(actual_client_fd, response);
         sprintf(response, "EVT LOGIN \"%s\" \"%s\"", client->user_uuid, username);
-        generate_all_connected_clients_event(response);
+        generate_all_logged_clients_event(response);
     }
 }
