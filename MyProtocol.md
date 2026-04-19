@@ -1,92 +1,127 @@
-# My Teams Protocol (RFC Like)
+# My Teams Wire Protocol Specification
 
-This document defines the custom protocol used for communication between the `myteams_cli` (client) and `myteams_server` (server) over TCP sockets.
+## 1. Scope
+This document specifies the application-layer protocol used between
+`myteams_cli` and `myteams_server` over TCP.
 
+This specification is intentionally aligned with the current implementation.
 
-## Client-to-Server Commands
+## 2. Conformance Language
+The key words MUST, MUST NOT, REQUIRED, SHOULD, SHOULD NOT, and MAY are to be
+interpreted as described in RFC 2119.
 
-The following commands are sent from the client to the server:
+## 3. Transport and Framing
+- Transport is TCP.
+- Each protocol message MUST be terminated by `CRLF` (`\r\n`).
+- The protocol is line-oriented.
 
-### Connection & Authentication
-            HELP <CRLF>                           : List available commands
-            LOGI <SP> "<username>" <CRLF>         : Log in to the server as user
-            LOGO <CRLF>                           : Disconnect from the server
+## 4. Authentication Rule
+Before login, the server accepts only `LOGI`.
+Any other command MUST be rejected with `401 Unauthorized.`.
 
-### Users & Messaging
-            USRS <CRLF>                           : List all users in the database
-            USER <SP> "<user_uuid>" <CRLF>        : Get details about a specific user
-            SEND <SP> "<user_uuid>" <SP> "<body>" <CRLF> : Send a private message to a user
-            MSGS <SP> "<user_uuid>" <CRLF>        : List conversation messages with a user
+## 5. Client-to-Server Commands
 
-### Teams & Subscriptions
-            SUB  <SP> "<team_uuid>" <CRLF>        : Subscribe to a team
-            USUB <SP> "<team_uuid>" <CRLF>        : Unsubscribe from a team
-            SUBL <CRLF>                           : List all teams the user is subscribed to
-            SUBU <SP> "<team_uuid>" <CRLF>        : List all users subscribed to a team
+### 5.1 Authentication
+- `LOGI "<username>"`
+- `LOGO`
 
-### Context Management
-            USE  <CRLF>                           : Reset context to global
-            USE  <SP> "<team_uuid>" [<SP> "<channel_uuid>"] [<SP> "<thread_uuid>"] <CRLF> : Set the current context
+### 5.2 Users and Messaging
+- `USRS`
+- `USER "<user_uuid>"`
+- `SEND "<user_uuid>" "<message_body>"`
+- `MSGS "<user_uuid>"`
 
-### Context-Aware Actions (Depends on USE context)
-            INFO <CRLF>                           : Display info about the current context
-            LIST <CRLF>                           : List items in the current context (teams/channels/threads/replies)
-            CREA <SP> "<arg1>" [<SP> "<arg2>"] <CRLF> : Create an item in the current context
+### 5.3 Subscriptions
+- `SUB "<team_uuid>"`
+- `USUB "<team_uuid>"`
+- `SUBL`
+- `SUBU "<team_uuid>"`
 
+### 5.4 Context
+- `USE`
+- `USE "<team_uuid>"`
+- `USE "<team_uuid>" "<channel_uuid>"`
+- `USE "<team_uuid>" "<channel_uuid>" "<thread_uuid>"`
 
-## Server-to-Client Replies
+### 5.5 Context-Aware Operations
+- `CREA "<arg1>"`
+- `CREA "<arg1>" "<arg2>"`
+- `LIST`
+- `INFO`
 
-The following respons are sent from the server to the client:
+Note: `/help` is local CLI behavior and does not send a wire command.
 
-#### 1xx - Informational
-         120 Service ready in nnn minutes.
-         150 File status okay; about to open data connection.
+## 6. Server-to-Client Replies
 
-#### 2xx - Success
-         200 Command okay / Context successfully updated.
-         214 Help message (Shows available commands to the client).
-         220 Service ready for new user.
-         221 Service closing control connection (Logged out).
-         230 User logged in, proceed.
-         240 List/Info payload follows (Used before sending USRS, SUBL, LIST payloads).
-         250 Requested action okay, completed (e.g., Message Sent, Valid Subscription).
-         251 Requested item created successfully (e.g., Team, Channel, Thread, Reply).
+### 6.1 Generic Status Replies
+- `220 Service ready for new user.`
+- `230 <user_uuid> <username>`
+- `240 List/Info payload follows.`
+- `250 Requested action okay, completed.`
+- `251 Requested item created successfully.`
+- `400 Bad Request.`
+- `401 Unauthorized.`
+- `403 Forbidden.`
+- `404 Not Found.`
+- `413 Payload Too Large.`
+- `500 Syntax error, command unrecognized.`
+- `550 Internal server error / Database failure.`
+- `560 Server full.`
 
-#### 3xx - Pending
-         300 Pending further action.
+### 6.2 Contextual and Extended Replies (Implemented)
+- `400 ALREADY_EXIST`
+- `404 TEAM Not Found`
+- `404 CHANNEL Not Found`
+- `404 THREAD Not Found`
+- `242 <user_uuid> <team_uuid>`
+- `243 <team_uuid> "<team_name>" "<team_description>"`
+- `244 <user_uuid> "<user_name>" <0|1>`
+- `431 Already subscribed`
+- `432 Not subscribed to this team`
+- `440 <team_uuid>`
 
-#### 4xx - Client Error
-         400 Bad Request (Missing quotes, invalid syntax, missing args).
-         401 Unauthorized (Client is not logged in).
-         403 Forbidden (User is logged in but lacks rights, e.g. not subscribed to a team).
-         404 Not Found (Requested UUID for user, team, channel, or thread does not exist).
-         413 Payload Too Large (e.g., name > 32 chars, desc > 255 chars, body > 512 chars).
+### 6.3 Data Lines
+- `USER <user_uuid> <user_name> <0|1>`
+- `MSG <sender_uuid> <timestamp> "<body>"`
+- `USE GLOBAL`
+- `USE TEAM`
+- `USE CHANNEL`
+- `USE THREAD`
 
-#### 5xx - Server Error
-         500 Syntax error, command unrecognized.
-         501 Syntax error in parameters or arguments.
-         503 Bad sequence of commands.
-         550 Internal server error / Database failure.
+## 7. Typed Payload Format (`251`)
+The implementation uses typed payload lines for create/list/info:
 
-## Server-to-Client Events
+- `251 TEAM "<team_uuid>" "<team_name>" "<team_description>"`
+- `251 CHANNEL "<channel_uuid>" "<channel_name>" "<channel_description>"`
+- `251 THREAD "<thread_uuid>" "<user_uuid>" <timestamp> "<thread_title>" "<thread_body>"`
+- `251 REPLY "<thread_uuid>" "<user_uuid>" <timestamp> "<reply_body>"`
+- `251 USER "<user_uuid>" "<user_name>" <0|1>`
 
-Events are broadcast from the server to relevant clients asynchronously:
+## 8. Asynchronous Events (`EVT`)
+Events are sent independently of command-response flow.
 
-### Authentication Events
-         EVT LOGIN "<user_uuid>" "<user_name>" : Sent to all connected clients when a user logs in
-         EVT LOGOUT "<user_uuid>" "<user_name>" : Sent to all connected clients when a user logs out
+- `EVT LOGIN "<user_uuid>" "<user_name>"`
+- `EVT LOGOUT "<user_uuid>" "<user_name>"`
+- `EVT PRIVATE_MESSAGE "<sender_uuid>" "<message_body>"`
+- `EVT TEAM_CREATED "<team_uuid>" "<team_name>" "<team_description>"`
+- `EVT CHANNEL_CREATED "<channel_uuid>" "<channel_name>" "<channel_description>"`
+- `EVT THREAD_CREATED "<thread_uuid>" "<user_uuid>" <timestamp> "<thread_title>" "<thread_body>"`
+- `EVT REPLY_CREATED "<thread_uuid>" "<user_uuid>" <timestamp> "<reply_body>"`
 
-### Team Events
-         EVT TEAM_CREATED "<team_uuid>" "<team_name>" "<team_description>" : Sent to all logged clients when a team is created
+Event delivery scope in current implementation:
+- LOGIN/LOGOUT: logged clients.
+- TEAM_CREATED: all logged clients.
+- CHANNEL_CREATED/THREAD_CREATED/REPLY_CREATED: logged subscribers of the team.
+- PRIVATE_MESSAGE: all logged sessions of the target user.
 
-### Channel Events
-         EVT CHANNEL_CREATED "<channel_uuid>" "<channel_name>" "<channel_description>" : Sent to team subscribers
+## 9. Context Semantics for `INFO`
+- Global context (`USE`): `INFO` returns current logged user details.
+- Team context (`USE "team_uuid"`): `INFO` returns selected team details.
+- Channel context (`USE "team_uuid" "channel_uuid"`): `INFO` returns selected channel details.
+- Thread context (`USE "team_uuid" "channel_uuid" "thread_uuid"`): `INFO` returns selected thread details.
 
-### Thread Events
-         EVT THREAD_CREATED "<thread_uuid>" "<user_uuid>" <timestamp> "<thread_title>" "<thread_body>" : Sent to team subscribers
-
-### Reply Events
-         EVT REPLY_CREATED "<thread_uuid>" "<user_uuid>" <timestamp> "<reply_body>" : Sent to team subscribers
-
-### Private Message Events
-         EVT PRIVATE_MESSAGE "<sender_uuid>" "<message_body>" : Sent to specific recipient when a private message is sent
+## 10. Context Semantics for `LIST`
+- Global: list teams.
+- Team context: list channels of selected team.
+- Channel context: list threads of selected channel.
+- Thread context: list replies of selected thread.
