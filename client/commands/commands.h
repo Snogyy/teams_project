@@ -18,3 +18,4 @@ int cmd_messages(char **args, int client_socket);
 int cmd_use(char **args, int client_socket);
 int cmd_create(char **args, int client_socket);
 int cmd_list(char **args, int client_socket);
+int cmd_info(char **args, int client_socket);
