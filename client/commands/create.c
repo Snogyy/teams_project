@@ -8,41 +8,6 @@
 #include "../client.h"
 #include "commands.h"
 
-static void display_approriate_error(char *line)
-{
-    char object_type[32] = {0};
-    char object_uuid[UUID_LENGTH] = {0};
-    int parsed_with_uuid = 0;
-
-    parsed_with_uuid = sscanf(line, "404 %31s \"%36[^\"]\"", object_type, object_uuid);
-    if (parsed_with_uuid != 2)
-        parsed_with_uuid = sscanf(line, "404 %31s %36s", object_type, object_uuid);
-    if (parsed_with_uuid < 1)
-        return;
-
-    if (strcmp(object_type, "TEAM") == 0) {
-        if (parsed_with_uuid == 2)
-            client_error_unknown_team(object_uuid);
-        else
-            client_error_unknown_team(current_context.team_uuid);
-    } else if (strcmp(object_type, "CHANNEL") == 0) {
-        if (parsed_with_uuid == 2)
-            client_error_unknown_channel(object_uuid);
-        else
-            client_error_unknown_channel(current_context.channel_uuid);
-    } else if (strcmp(object_type, "THREAD") == 0) {
-        if (parsed_with_uuid == 2)
-            client_error_unknown_thread(object_uuid);
-        else
-            client_error_unknown_thread(current_context.thread_uuid);
-    } else if (strcmp(object_type, "USER") == 0) {
-        if (parsed_with_uuid == 2)
-            client_error_unknown_user(object_uuid);
-        else
-            client_error_unknown_user("");
-    }
-}
-
 void handle_create_response(char *line)
 {
     char type[16] = {0};
@@ -117,7 +82,7 @@ int cmd_create(char **args, int client_socket)
         else if (strncmp(line, "403", 3) == 0)
             client_error_unauthorized();
         else if (strncmp(line, "404", 3) == 0)
-            display_approriate_error(line);
+            display_notfound_error(line);
         line = strtok(NULL, "\r\n");
     }
 

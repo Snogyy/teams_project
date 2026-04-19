@@ -51,6 +51,7 @@
 
     void parse_commands(int client_socket);
     void parse_events(char *server_mess);
+    void display_notfound_error(char *line);
     extern user_t current_user;
     extern client_context_t current_context;
     extern commands_t commands[];

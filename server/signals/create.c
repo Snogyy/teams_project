@@ -17,11 +17,6 @@ void send_create_response(char *type, char *payload)
     generate_client_respons(actual_client_fd, response);
 }
 
-void send_already_exist_response(void)
-{
-    generate_client_respons(actual_client_fd, "400 ALREADY_EXIST");
-}
-
 bool team_name_exists(char const *name)
 {
     for (int i = 0; i < server.nb_teams; i++) {
@@ -49,67 +44,6 @@ bool thread_title_exists(char const *channel_uuid, char const *title)
     return false;
 }
 
-bool is_user_subscribed_to_team(char *team_uuid, char *user_uuid)
-{
-    for (int i = 0; i < server.nb_teams; i++) {
-        if (strcmp(server.teams[i].uuid, team_uuid) == 0) {
-            for (int j = 0; j < server.teams[i].nb_subscribers; j++) {
-                if (strcmp(server.teams[i].subscribers[j], user_uuid) == 0)
-                    return true;
-            }
-            return false;
-        }
-    }
-    return false;
-}
-
-// Verify if uuid enter in /use command is valid
-bool is_valid_uuid(client_context_t context)
-{
-    bool team_valid = false;
-    bool channel_valid = false;
-    bool thread_valid = false;
-
-    if (context.team_uuid[0] != '\0') {
-        for (int i = 0; i < server.nb_teams; i++) {
-            if (strcmp(server.teams[i].uuid, context.team_uuid) == 0) {
-                team_valid = true;
-                break;
-            }
-        }
-        if (!team_valid) {
-            generate_client_respons(actual_client_fd, "404 TEAM Not Found");
-            return false;
-        }
-    }
-    if (context.channel_uuid[0] != '\0') {
-        for (int i = 0; i < server.nb_channels; i++) {
-            if (strcmp(server.channels[i].uuid, context.channel_uuid) == 0) {
-                channel_valid = true;
-                break;
-            }
-        }
-        if (!channel_valid) {
-            generate_client_respons(actual_client_fd, "404 CHANNEL Not Found");
-            return false;
-        }
-    }
-    if (context.thread_uuid[0] != '\0') {
-        for (int i = 0; i < server.nb_threads; i++) {
-            if (strcmp(server.threads[i].uuid, context.thread_uuid) == 0) {
-                thread_valid = true;
-                break;
-            }
-        }
-        if (!thread_valid) {
-            generate_client_respons(actual_client_fd, "404 THREAD Not Found");
-            return false;
-        }
-    }
-
-    return true;
-}
-
 
 // Create TEAM
 void create_team(char **av)
@@ -123,7 +57,7 @@ void create_team(char **av)
     snprintf(new_team.description, sizeof(new_team.description), "%s", av[1]);
 
     if (team_name_exists(new_team.name))
-        return send_already_exist_response();
+        return generate_client_respons(actual_client_fd, "400 ALREADY_EXIST");;
 
     uuid_t id;
     uuid_generate(id);
@@ -144,7 +78,7 @@ void create_channel(char **av)
 {
     channel_t new_channel;
 
-    if (!is_valid_uuid(client->context))
+    if (!is_valid_uuid(client->context, actual_client_fd))
         return;
     if (!is_user_subscribed_to_team(client->context.team_uuid, client->user_uuid))
         return generate_client_respons(actual_client_fd, find_reply_server(403));
@@ -154,7 +88,7 @@ void create_channel(char **av)
     snprintf(new_channel.team_uuid, sizeof(new_channel.team_uuid), "%s", client->context.team_uuid);
 
     if (channel_name_exists(new_channel.team_uuid, new_channel.name))
-        return send_already_exist_response();
+        return generate_client_respons(actual_client_fd, "400 ALREADY_EXIST");;
 
     uuid_t id;
     uuid_generate(id);
@@ -175,7 +109,7 @@ void create_thread(char **av)
 {
     thread_t new_thread;
 
-    if (!is_valid_uuid(client->context))
+    if (!is_valid_uuid(client->context, actual_client_fd))
         return;
     if (!is_user_subscribed_to_team(client->context.team_uuid, client->user_uuid))
         return generate_client_respons(actual_client_fd, find_reply_server(403));
@@ -184,9 +118,10 @@ void create_thread(char **av)
     snprintf(new_thread.body, sizeof(new_thread.body), "%s", av[1]);
     snprintf(new_thread.team_uuid, sizeof(new_thread.team_uuid), "%s", client->context.team_uuid);
     snprintf(new_thread.channel_uuid, sizeof(new_thread.channel_uuid), "%s", client->context.channel_uuid);
+    snprintf(new_thread.user_uuid, sizeof(new_thread.user_uuid), "%s", client->user_uuid);
 
     if (thread_title_exists(new_thread.channel_uuid, new_thread.title))
-        return send_already_exist_response();
+        return generate_client_respons(actual_client_fd, "400 ALREADY_EXIST");
 
     uuid_t id;
     uuid_generate(id);
@@ -195,11 +130,11 @@ void create_thread(char **av)
     server.threads[server.nb_threads] = new_thread;
     server.nb_threads += 1;
 
-    server_event_thread_created(new_thread.channel_uuid, new_thread.uuid, client->user_uuid, new_thread.title, new_thread.body);
+    server_event_thread_created(new_thread.channel_uuid, new_thread.uuid, new_thread.user_uuid, new_thread.title, new_thread.body);
     char payload[1024];
-    snprintf(payload, sizeof(payload), "\"%s\" \"%s\" %ld \"%s\" \"%s\"", new_thread.uuid, client->user_uuid, (long)new_thread.timestamp, new_thread.title, new_thread.body);
+    snprintf(payload, sizeof(payload), "\"%s\" \"%s\" %ld \"%s\" \"%s\"", new_thread.uuid, new_thread.user_uuid, (long)new_thread.timestamp, new_thread.title, new_thread.body);
     send_create_response("THREAD", payload);
-    snprintf(payload, sizeof(payload), "EVT THREAD_CREATED \"%s\" \"%s\" %ld \"%s\" \"%s\"", new_thread.uuid, client->user_uuid, (long)new_thread.timestamp, new_thread.title, new_thread.body);
+    snprintf(payload, sizeof(payload), "EVT THREAD_CREATED \"%s\" \"%s\" %ld \"%s\" \"%s\"", new_thread.uuid, new_thread.user_uuid, (long)new_thread.timestamp, new_thread.title, new_thread.body);
     generate_team_subscribers_event(new_thread.team_uuid, payload);
 }
 
@@ -208,7 +143,7 @@ void create_reply(char **av)
 {
     reply_thread_t new_reply;
 
-    if (!is_valid_uuid(client->context))
+    if (!is_valid_uuid(client->context, actual_client_fd))
         return;
     if (!is_user_subscribed_to_team(client->context.team_uuid, client->user_uuid))
         return generate_client_respons(actual_client_fd, find_reply_server(403));
@@ -217,6 +152,7 @@ void create_reply(char **av)
     snprintf(new_reply.team_uuid, sizeof(new_reply.team_uuid), "%s", client->context.team_uuid);
     snprintf(new_reply.channel_uuid, sizeof(new_reply.channel_uuid), "%s", client->context.channel_uuid);
     snprintf(new_reply.thread_uuid, sizeof(new_reply.thread_uuid), "%s", client->context.thread_uuid);
+    snprintf(new_reply.user_uuid, sizeof(new_reply.user_uuid), "%s", client->user_uuid);
 
     uuid_t id;
     uuid_generate(id);
@@ -225,11 +161,11 @@ void create_reply(char **av)
     server.replies[server.nb_replies] = new_reply;
     server.nb_replies += 1;
 
-    server_event_reply_created(new_reply.thread_uuid, client->user_uuid, new_reply.body);
+    server_event_reply_created(new_reply.thread_uuid, new_reply.user_uuid, new_reply.body);
     char payload[1024];
-    snprintf(payload, sizeof(payload), "\"%s\" \"%s\" %ld \"%s\"", new_reply.thread_uuid, client->user_uuid, (long)new_reply.timestamp, new_reply.body);
+    snprintf(payload, sizeof(payload), "\"%s\" \"%s\" %ld \"%s\"", new_reply.thread_uuid, new_reply.user_uuid, (long)new_reply.timestamp, new_reply.body);
     send_create_response("REPLY", payload);
-    snprintf(payload, sizeof(payload), "EVT REPLY_CREATED \"%s\" \"%s\" %ld \"%s\"", new_reply.thread_uuid, client->user_uuid, (long)new_reply.timestamp, new_reply.body);
+    snprintf(payload, sizeof(payload), "EVT REPLY_CREATED \"%s\" \"%s\" %ld \"%s\"", new_reply.thread_uuid, new_reply.user_uuid, (long)new_reply.timestamp, new_reply.body);
     generate_team_subscribers_event(new_reply.team_uuid, payload);
 }
 

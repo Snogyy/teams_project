@@ -63,6 +63,7 @@
         char uuid[UUID_LENGTH];
         char team_uuid[UUID_LENGTH];
         char channel_uuid[UUID_LENGTH];
+        char user_uuid[UUID_LENGTH];
         char title[MAX_NAME_LENGTH];
         char body[MAX_BODY_LENGTH];
         time_t timestamp;
@@ -73,6 +74,7 @@
         char team_uuid[UUID_LENGTH];
         char channel_uuid[UUID_LENGTH];
         char thread_uuid[UUID_LENGTH];
+        char user_uuid[UUID_LENGTH];
         char body[MAX_BODY_LENGTH];
         time_t timestamp;
     } reply_thread_t;
@@ -150,6 +152,8 @@
     char *find_reply_server(int reply_nb);
     void parse_signals(char *received_buffer, int client_index);
     int extract_args(char *argument, char **av, int max_args);
+    bool is_valid_uuid(client_context_t context, int actual_client_fd);
+    bool is_user_subscribed_to_team(char *team_uuid, char *user_uuid);
 
     void save_db(void);
     void load_db(void);
