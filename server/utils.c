@@ -24,6 +24,7 @@ signals_t signals[] = {
     {"USE", signal_use},
     {"CREA", signal_create},
     {"LIST", signal_list},
+    {"INFO", signal_info},
     {NULL, NULL}
 };
 

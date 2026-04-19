@@ -18,3 +18,4 @@ void signal_messages(char *argument, int client_index);
 void signal_use(char *argument, int client_index);
 void signal_create(char *argument, int client_index);
 void signal_list(char *argument, int client_index);
+void signal_info(char *argument, int client_index);

@@ -31,6 +31,7 @@ commands_t commands[] = {
     {"/use", cmd_use},
     {"/create", cmd_create},
     {"/list", cmd_list},
+    {"/info", cmd_info},
     {NULL, NULL}
 };
 
