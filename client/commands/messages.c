@@ -2,7 +2,7 @@
 ** Project  -  my_teams
 ** Date     -  April 14th 2026
 **
-** Copyright (c) 2026 Jules Nourdin
+** Copyright (c) 2026 Quentin Beyl
 */
 
 #include "../client.h"
@@ -12,7 +12,7 @@ int cmd_messages(char **args, int client_socket)
 {
     if (args[1] == NULL || args[2] != NULL) {
         printf("Usage: /messages \"user_uuid\"\n");
-        return 1;
+        return 0;
     }
 
     char cmd[512];
@@ -42,9 +42,9 @@ int cmd_messages(char **args, int client_socket)
             return 1;
         } else if (strncmp(line, "401", 3) == 0) {
             client_error_unauthorized();
-            return 1;
+            return 0;
         }
         line = strtok(NULL, "\r\n");
     }
-    return 1;
+    return 0;
 }

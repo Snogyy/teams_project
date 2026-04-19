@@ -104,6 +104,21 @@ void parse_commands(int client_socket)
                 printf("\n-> Server disconnected.\n");
                 break;
             }
+            server_mess[res_read] = '\0';
+
+            char *line = strtok(server_mess, "\r\n");
+            while (line != NULL) {
+                if (strncmp(line, "PMSG ", 5) == 0) {
+                    char sender_uuid[UUID_LENGTH];
+                    char body[MAX_BODY_LENGTH];
+                    if (sscanf(line + 5, "%36s \"%511[^\"]\"", sender_uuid, body) == 2) {
+                        printf("\r");
+                        client_event_private_message_received(sender_uuid, body);
+                        fflush(stdout);
+                    }
+                }
+                line = strtok(NULL, "\r\n");
+            }
             continue;
         }
 
