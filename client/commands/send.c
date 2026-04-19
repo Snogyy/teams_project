@@ -37,12 +37,6 @@ int cmd_send(char **args, int client_socket)
             client_error_unauthorized();
         else if (strncmp(line, "413", 3) == 0)
             printf("Message too long\n");
-        else if (strncmp(line, "PMSG ", 5) == 0) {
-            char sender_uuid[UUID_LENGTH];
-            char body[MAX_BODY_LENGTH];
-            if (sscanf(line + 5, "%36s \"%511[^\"]\"", sender_uuid, body) == 2)
-                client_event_private_message_received(sender_uuid, body);
-        }
         line = strtok(NULL, "\r\n");
     }
     return 1;

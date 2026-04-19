@@ -45,8 +45,7 @@ void signal_messages(char *argument, int client_index)
             (strcmp(msg->sender_uuid, target_uuid) == 0 &&
              strcmp(msg->receiver_uuid, client->user_uuid) == 0)) {
             char line[MAX_BODY_LENGTH + 100];
-            snprintf(line, sizeof(line), "MSG %s %ld \"%s\"",
-                msg->sender_uuid, msg->timestamp, msg->body);
+            snprintf(line, sizeof(line), "MSG %s %ld \"%s\"", msg->sender_uuid, msg->timestamp, msg->body);
             generate_client_respons(actual_client_fd, line);
         }
     }

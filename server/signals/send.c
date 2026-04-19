@@ -71,11 +71,10 @@ void signal_send(char *argument, int client_index)
     server.nb_messages++;
 
     for (int i = 1; i < server.nb_clients; i++) {
-        if (strcmp(server.clients[i - 1].user_uuid, receiver_uuid) == 0) {
+        if (server.clients[i - 1].logged && strcmp(server.clients[i - 1].user_uuid, receiver_uuid) == 0) {
             char notif[512 + 100];
-            snprintf(notif, sizeof(notif), "PMSG %s \"%s\"", client->user_uuid, body);
+            snprintf(notif, sizeof(notif), "EVT PRIVATE_MESSAGE \"%s\" \"%s\"", client->user_uuid, body);
             generate_client_respons(server.pfd_list[i].fd, notif);
-            break;
         }
     }
 
