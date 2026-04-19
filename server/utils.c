@@ -23,6 +23,7 @@ signals_t signals[] = {
     {"MSGS", signal_messages},
     {"USE", signal_use},
     {"CREA", signal_create},
+    {"LIST", signal_list},
     {NULL, NULL}
 };
 
@@ -121,4 +122,65 @@ int extract_args(char *argument, char **av, int max_args)
         cursor++;
     }
     return ac;
+}
+
+bool is_user_subscribed_to_team(char *team_uuid, char *user_uuid)
+{
+    for (int i = 0; i < server.nb_teams; i++) {
+        if (strcmp(server.teams[i].uuid, team_uuid) == 0) {
+            for (int j = 0; j < server.teams[i].nb_subscribers; j++) {
+                if (strcmp(server.teams[i].subscribers[j], user_uuid) == 0)
+                    return true;
+            }
+            return false;
+        }
+    }
+    return false;
+}
+
+// Verify if uuid enter in /use command is valid
+bool is_valid_uuid(client_context_t context, int actual_client_fd)
+{
+    bool team_valid = false;
+    bool channel_valid = false;
+    bool thread_valid = false;
+
+    if (context.team_uuid[0] != '\0') {
+        for (int i = 0; i < server.nb_teams; i++) {
+            if (strcmp(server.teams[i].uuid, context.team_uuid) == 0) {
+                team_valid = true;
+                break;
+            }
+        }
+        if (!team_valid) {
+            generate_client_respons(actual_client_fd, "404 TEAM Not Found");
+            return false;
+        }
+    }
+    if (context.channel_uuid[0] != '\0') {
+        for (int i = 0; i < server.nb_channels; i++) {
+            if (strcmp(server.channels[i].uuid, context.channel_uuid) == 0) {
+                channel_valid = true;
+                break;
+            }
+        }
+        if (!channel_valid) {
+            generate_client_respons(actual_client_fd, "404 CHANNEL Not Found");
+            return false;
+        }
+    }
+    if (context.thread_uuid[0] != '\0') {
+        for (int i = 0; i < server.nb_threads; i++) {
+            if (strcmp(server.threads[i].uuid, context.thread_uuid) == 0) {
+                thread_valid = true;
+                break;
+            }
+        }
+        if (!thread_valid) {
+            generate_client_respons(actual_client_fd, "404 THREAD Not Found");
+            return false;
+        }
+    }
+
+    return true;
 }

@@ -35,11 +35,16 @@ void save_db(void)
     if (server.nb_threads > 0)
         fwrite(server.threads, sizeof(thread_t), server.nb_threads, fd);
 
+    // Save replies
+    fwrite(&server.nb_replies, sizeof(int), 1, fd);
+    if (server.nb_replies > 0)
+        fwrite(server.replies, sizeof(reply_thread_t), server.nb_replies, fd);
+
     // Save messages
     fwrite(&server.nb_messages, sizeof(int), 1, fd);
     if (server.nb_messages > 0)
         fwrite(server.messages, sizeof(private_message_t), server.nb_messages, fd);
-    
+
     fclose(fd);
     printf("-> Database saved successfully\n");
 }
@@ -53,6 +58,8 @@ void load_db(void)
         server.nb_teams = 0;
         server.nb_channels = 0;
         server.nb_threads = 0;
+        server.nb_replies = 0;
+        server.nb_messages = 0;
         return;
     }
 
@@ -77,10 +84,14 @@ void load_db(void)
     if (fread(&server.nb_threads, sizeof(int), 1, fd) == 1 && server.nb_threads > 0)
         fread(server.threads, sizeof(thread_t), server.nb_threads, fd);
 
+    // Load replies
+    if (fread(&server.nb_replies, sizeof(int), 1, fd) == 1 && server.nb_replies > 0)
+        fread(server.replies, sizeof(reply_thread_t), server.nb_replies, fd);
+
     // Load messages
     if (fread(&server.nb_messages, sizeof(int), 1, fd) == 1 && server.nb_messages > 0)
         fread(server.messages, sizeof(private_message_t), server.nb_messages, fd);
-    
+
     fclose(fd);
     printf("-> Database loaded successfully\n");
 }
