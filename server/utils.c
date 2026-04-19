@@ -13,6 +13,10 @@ server_struct_t server;
 signals_t signals[] = {
     {"LOGI", signal_login},
     {"LOGO", signal_logout},
+    {"SUB", signal_subscribe},
+    {"USUB", signal_unsubscribe},
+    {"SUBL", signal_subscribed_list},
+    {"SUBU", signal_subscribed_users},
     {"USRS", signal_users},
     {"USER", signal_user},
     {"SEND", signal_send},
@@ -32,6 +36,7 @@ reply_server_t replies[] = {
     {251, "251 Requested item created successfully."},
     {400, "400 Bad Request."},
     {401, "401 Unauthorized."},
+    {403, "403 Forbidden."},
     {404, "404 Not Found."},
     {413, "413 Payload Too Large."},
     {500, "500 Syntax error, command unrecognized."},

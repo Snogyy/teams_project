@@ -49,6 +49,20 @@ bool thread_title_exists(char const *channel_uuid, char const *title)
     return false;
 }
 
+bool is_user_subscribed_to_team(char *team_uuid, char *user_uuid)
+{
+    for (int i = 0; i < server.nb_teams; i++) {
+        if (strcmp(server.teams[i].uuid, team_uuid) == 0) {
+            for (int j = 0; j < server.teams[i].nb_subscribers; j++) {
+                if (strcmp(server.teams[i].subscribers[j], user_uuid) == 0)
+                    return true;
+            }
+            return false;
+        }
+    }
+    return false;
+}
+
 // Verify if uuid enter in /use command is valid
 bool is_valid_uuid(client_context_t context)
 {
@@ -132,6 +146,8 @@ void create_channel(char **av)
 
     if (!is_valid_uuid(client->context))
         return;
+    if (!is_user_subscribed_to_team(client->context.team_uuid, client->user_uuid))
+        return generate_client_respons(actual_client_fd, find_reply_server(403));
 
     snprintf(new_channel.name, sizeof(new_channel.name), "%s", av[0]);
     snprintf(new_channel.description, sizeof(new_channel.description), "%s", av[1]);
@@ -161,6 +177,8 @@ void create_thread(char **av)
 
     if (!is_valid_uuid(client->context))
         return;
+    if (!is_user_subscribed_to_team(client->context.team_uuid, client->user_uuid))
+        return generate_client_respons(actual_client_fd, find_reply_server(403));
 
     snprintf(new_thread.title, sizeof(new_thread.title), "%s", av[0]);
     snprintf(new_thread.body, sizeof(new_thread.body), "%s", av[1]);
@@ -192,6 +210,8 @@ void create_reply(char **av)
 
     if (!is_valid_uuid(client->context))
         return;
+    if (!is_user_subscribed_to_team(client->context.team_uuid, client->user_uuid))
+        return generate_client_respons(actual_client_fd, find_reply_server(403));
 
     snprintf(new_reply.body, sizeof(new_reply.body), "%s", av[0]);
     snprintf(new_reply.team_uuid, sizeof(new_reply.team_uuid), "%s", client->context.team_uuid);

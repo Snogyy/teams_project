@@ -114,6 +114,8 @@ int cmd_create(char **args, int client_socket)
             client_error_already_exist();
         else if (strncmp(line, "400", 3) == 0)
             printf("-> ERROR: Bad request.\n");
+        else if (strncmp(line, "403", 3) == 0)
+            client_error_unauthorized();
         else if (strncmp(line, "404", 3) == 0)
             display_approriate_error(line);
         line = strtok(NULL, "\r\n");

@@ -7,6 +7,10 @@
 
 void signal_login(char *argument, int client_index);
 void signal_logout(char *argument, int client_index);
+void signal_subscribe(char *argument, int client_index);
+void signal_subscribed_list(char *argument, int client_index);
+void signal_subscribed_users(char *argument, int client_index);
+void signal_unsubscribe(char *argument, int client_index);
 void signal_users(char *argument, int client_index);
 void signal_user(char *argument, int client_index);
 void signal_send(char *argument, int client_index);

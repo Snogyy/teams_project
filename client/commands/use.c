@@ -22,8 +22,6 @@ void define_context_level(char *line)
         current_context.context_level = CHANNEL;
     else if (strcmp(context_level, "THREAD") == 0)
         current_context.context_level = THREAD;
-
-    printf("%s\n", context_level);
 }
 
 void send_server_context(char **args, int client_socket)
