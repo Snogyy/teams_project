@@ -19,7 +19,6 @@ int cmd_login(char **args, int client_socket)
         return 1;
     }
 
-    // Send LOGI command to server
     char cmd[1024];
     snprintf(cmd, sizeof(cmd), "LOGI \"%s\"\r\n", args[1]);
     write(client_socket, cmd, strlen(cmd));
@@ -32,21 +31,19 @@ int cmd_login(char **args, int client_socket)
         return cmd_logout(args, client_socket);
     response[res_read] = '\0';
 
-    if (strncmp(response, "230", 3) == 0) {
-        current_user.is_logged = true;
-        strcpy(current_user.username, args[1]);
-
-        // Parse the respons of the server
+    if (strncmp(response, "230 ", 4) == 0) {
+        char user_uuid[UUID_LENGTH] = {0};
+        char user_name[MAX_NAME_LENGTH] = {0};
         char *ptr = response + 4;
-        char *uuid_str = strtok(ptr, " ");
 
-        if (uuid_str) {
-            strcpy(current_user.uuid, uuid_str);
-            client_event_logged_in(current_user.uuid, current_user.username);
-        } else
-            printf("-> Error: Missing UUID in server response.\n");
+        if (sscanf(ptr, "%36s %31s", user_uuid, user_name) == 2) {
+            current_user.is_logged = true;
+            strcpy(current_user.uuid, user_uuid);
+            strcpy(current_user.username, user_name);
+            client_event_logged_in(user_uuid, user_name);
+        }
     } else
-        printf("-> Login failed: %s", response);
+        printf("-> Login failed\n");
 
     return 1;
 }

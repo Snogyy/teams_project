@@ -67,3 +67,26 @@ The following respons are sent from the server to the client:
          501 Syntax error in parameters or arguments.
          503 Bad sequence of commands.
          550 Internal server error / Database failure.
+
+## Server-to-Client Events
+
+Events are broadcast from the server to relevant clients asynchronously:
+
+### Authentication Events
+         EVT LOGIN "<user_uuid>" "<user_name>" : Sent to all connected clients when a user logs in
+         EVT LOGOUT "<user_uuid>" "<user_name>" : Sent to all connected clients when a user logs out
+
+### Team Events
+         EVT TEAM_CREATED "<team_uuid>" "<team_name>" "<team_description>" : Sent to all logged clients when a team is created
+
+### Channel Events
+         EVT CHANNEL_CREATED "<channel_uuid>" "<channel_name>" "<channel_description>" : Sent to team subscribers
+
+### Thread Events
+         EVT THREAD_CREATED "<thread_uuid>" "<user_uuid>" <timestamp> "<thread_title>" "<thread_body>" : Sent to team subscribers
+
+### Reply Events
+         EVT REPLY_CREATED "<thread_uuid>" "<user_uuid>" <timestamp> "<reply_body>" : Sent to team subscribers
+
+### Private Message Events
+         EVT PRIVATE_MESSAGE "<sender_uuid>" "<message_body>" : Sent to specific recipient when a private message is sent

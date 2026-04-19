@@ -35,11 +35,6 @@ void signal_login(char *argument, int client_index)
 
     // User exists
     if (user_index != -1) {
-        if (server.users[user_index].is_connected) {
-            generate_client_respons(actual_client_fd, find_reply_server(430));
-            return;
-        }
-
         server.users[user_index].is_connected = true;
         strcpy(client->user_uuid, server.users[user_index].uuid);
         strcpy(client->username, username);
@@ -49,6 +44,8 @@ void signal_login(char *argument, int client_index)
         char response[1024];
         sprintf(response, "230 %s %s", client->user_uuid, username);
         generate_client_respons(actual_client_fd, response);
+        sprintf(response, "EVT LOGIN \"%s\" \"%s\"", client->user_uuid, username);
+        generate_all_connected_clients_event(response);
     // Create user
     } else {
         if (server.nb_users >= MAX_CLIENTS) {
@@ -72,5 +69,7 @@ void signal_login(char *argument, int client_index)
         char response[1024];
         sprintf(response, "230 %s %s", client->user_uuid, username);
         generate_client_respons(actual_client_fd, response);
+        sprintf(response, "EVT LOGIN \"%s\" \"%s\"", client->user_uuid, username);
+        generate_all_connected_clients_event(response);
     }
 }

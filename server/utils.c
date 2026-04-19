@@ -34,7 +34,6 @@ reply_server_t replies[] = {
     {401, "401 Unauthorized."},
     {404, "404 Not Found."},
     {413, "413 Payload Too Large."},
-    {430, "430 User already connected."},
     {500, "500 Syntax error, command unrecognized."},
     {550, "550 Internal server error / Database failure."},
     {560, "560 Server full."},
@@ -60,6 +59,35 @@ void generate_client_respons(int fd, char *respons)
     char buffer[1024];
     snprintf(buffer, sizeof(buffer), "%s\r\n", respons);
     append_to_client_buffer(fd, buffer);
+}
+
+void generate_all_connected_clients_event(char *event_message)
+{
+    for (int i = 1; i < server.nb_clients; i++)
+        generate_client_respons(server.pfd_list[i].fd, event_message);
+}
+
+void generate_all_logged_clients_event(char *event_message)
+{
+    for (int i = 1; i < server.nb_clients; i++) {
+        if (server.clients[i - 1].logged)
+            generate_client_respons(server.pfd_list[i].fd, event_message);
+    }
+}
+
+void generate_team_subscribers_event(char *team_uuid, char *event_message)
+{
+    for (int i = 0; i < server.nb_teams; i++) {
+        if (strcmp(server.teams[i].uuid, team_uuid) == 0) {
+            for (int j = 0; j < server.teams[i].nb_subscribers; j++) {
+                for (int k = 1; k < server.nb_clients; k++) {
+                    if (server.clients[k - 1].logged && strcmp(server.clients[k - 1].user_uuid, server.teams[i].subscribers[j]) == 0)
+                        generate_client_respons(server.pfd_list[k].fd, event_message);
+                }
+            }
+            return;
+        }
+    }
 }
 
 char *find_reply_server(int reply_nb)

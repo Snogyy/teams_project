@@ -121,6 +121,8 @@ void create_team(char **av)
     char payload[1024];
     snprintf(payload, sizeof(payload), "\"%s\" \"%s\" \"%s\"", new_team.uuid, new_team.name, new_team.description);
     send_create_response("TEAM", payload);
+    snprintf(payload, sizeof(payload), "EVT TEAM_CREATED \"%s\" \"%s\" \"%s\"", new_team.uuid, new_team.name, new_team.description);
+    generate_all_logged_clients_event(payload);
 }
 
 // Create CHANNEL
@@ -148,6 +150,8 @@ void create_channel(char **av)
     char payload[1024];
     snprintf(payload, sizeof(payload), "\"%s\" \"%s\" \"%s\"", new_channel.uuid, new_channel.name, new_channel.description);
     send_create_response("CHANNEL", payload);
+    snprintf(payload, sizeof(payload), "EVT CHANNEL_CREATED \"%s\" \"%s\" \"%s\"", new_channel.uuid, new_channel.name, new_channel.description);
+    generate_team_subscribers_event(new_channel.team_uuid, payload);
 }
 
 // Create THREAD
@@ -177,6 +181,8 @@ void create_thread(char **av)
     char payload[1024];
     snprintf(payload, sizeof(payload), "\"%s\" \"%s\" %ld \"%s\" \"%s\"", new_thread.uuid, client->user_uuid, (long)new_thread.timestamp, new_thread.title, new_thread.body);
     send_create_response("THREAD", payload);
+    snprintf(payload, sizeof(payload), "EVT THREAD_CREATED \"%s\" \"%s\" %ld \"%s\" \"%s\"", new_thread.uuid, client->user_uuid, (long)new_thread.timestamp, new_thread.title, new_thread.body);
+    generate_team_subscribers_event(new_thread.team_uuid, payload);
 }
 
 // Create REPLY
@@ -203,6 +209,8 @@ void create_reply(char **av)
     char payload[1024];
     snprintf(payload, sizeof(payload), "\"%s\" \"%s\" %ld \"%s\"", new_reply.thread_uuid, client->user_uuid, (long)new_reply.timestamp, new_reply.body);
     send_create_response("REPLY", payload);
+    snprintf(payload, sizeof(payload), "EVT REPLY_CREATED \"%s\" \"%s\" %ld \"%s\"", new_reply.thread_uuid, client->user_uuid, (long)new_reply.timestamp, new_reply.body);
+    generate_team_subscribers_event(new_reply.team_uuid, payload);
 }
 
 void signal_create(char *argument, int client_index)

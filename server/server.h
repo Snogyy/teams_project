@@ -144,6 +144,9 @@
     void handle_client();
     void append_to_client_buffer(int fd, char *str);
     void generate_client_respons(int fd, char *respons);
+    void generate_all_connected_clients_event(char *event_message);
+    void generate_all_logged_clients_event(char *event_message);
+    void generate_team_subscribers_event(char *team_uuid, char *event_message);
     char *find_reply_server(int reply_nb);
     void parse_signals(char *received_buffer, int client_index);
     int extract_args(char *argument, char **av, int max_args);

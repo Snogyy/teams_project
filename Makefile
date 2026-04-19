@@ -22,6 +22,7 @@ SRC_SERVER 	=	server/server.c \
 SRC_CLIENT 	=	client/client.c \
 				client/utils.c \
 				client/parse_commands.c \
+				client/parse_events.c \
 				client/commands/login.c \
 				client/commands/logout.c \
 				client/commands/help.c \
