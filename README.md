@@ -161,3 +161,7 @@ Team + channel + thread context:
 - libs/myteams/: provided logging headers/library
 - MyProtocol.md: protocol specification
 - Makefile: build rules
+
+---
+
+Epitech students, beware of -42 !
